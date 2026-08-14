@@ -1,21 +1,14 @@
 {
-  "functions": {
-    "api/index.py": {
-      "runtime": "python3.12"
-    }
+  "name": "telegram-session-generator",
+  "version": "1.0.0",
+  "engines": {
+    "node": "18.x"
   },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|svg|ico))",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/static/index.html"
-    }
-  ]
+  "scripts": {
+    "dev": "python api/index.py",
+    "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
 }
