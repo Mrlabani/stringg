@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Session Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+    
+    h1 {
+      color: #fff;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    
+    .subtitle {
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    
+    .form-group {
+      margin-bottom: 18px;
+    }
+    
+    label {
+      display: block;
+      color: rgba(255,255,255,0.8);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #6c63ff;
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 0 20px rgba(108, 99, 255, 0.15);
+    }
+    
+    input::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6c63ff, #5a52d5);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(108, 99, 255, 0.3);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      margin-top: 10px;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.2);
+      box-shadow: none;
+    }
+    
+    .result {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: none;
+    }
+    
+    .result.show {
+      display: block;
+    }
+    
+    .result-label {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    
+    .result-string {
+      color: #6cff8c;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      word-break: break-all;
+      padding: 12px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      user-select: all;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .warning {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.2);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 16px;
+      display: none;
+    }
+    
+    .warning.show {
+      display: block;
+    }
+    
+    .warning-text {
+      color: #ffc107;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    
+    .status {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      text-align: center;
+      margin-top: 12px;
+    }
+    
+    .status.loading {
+      color: #6c63ff;
+    }
+    
+    .status.success {
+      color: #6cff8c;
+    }
+    
+    .status.error {
+      color: #ff6b6b;
+    }
+    
+    .step {
+      display: none;
+    }
+    
+    .step.active {
+      display: block;
+    }
+    
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 20px 0;
+    }
+    
+    .info {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      text-align: center;
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+    
+    .info a {
+      color: #6c63ff;
+      text-decoration: none;
+    }
+    
+    .user-info {
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      padding: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Telegram Session</h1>
+    <p class="subtitle">Generate your session string securely</p>
+    
+    <!-- Step 0: API Credentials -->
+    <div class="step active" id="step-api">
+      <div class="form-group">
+        <label>🔑 API ID</label>
+        <input type="number" id="api-id" placeholder="123456">
+      </div>
+      <div class="form-group">
+        <label>🔐 API Hash</label>
+        <input type="text" id="api-hash" placeholder="your_api_hash_here">
+      </div>
+      <div class="info">
+        Get your API credentials from <a href="https://my.telegram.org/apps" target="_blank">my.telegram.org/apps</a>
+      </div>
+      <button class="btn" id="btn-api">Continue</button>
+    </div>
+    
+    <!-- Step 1: Phone Number -->
+    <div class="step" id="step-phone">
+      <div class="form-group">
+        <label>📱 Phone Number</label>
+        <input type="tel" id="phone" placeholder="+919876543210">
+      </div>
+      <button class="btn" id="btn-phone">Send Code</button>
+      <div class="status" id="status-phone"></div>
+    </div>
+    
+    <!-- Step 2: Verification Code -->
+    <div class="step" id="step-code">
+      <div class="form-group">
+        <label>✉️ Verification Code</label>
+        <input type="text" id="code" placeholder="Enter the code you received" maxlength="8">
+      </div>
+      <button class="btn" id="btn-code">Verify Code</button>
+      <div class="status" id="status-code"></div>
+    </div>
+    
+    <!-- Step 3: 2FA Password -->
+    <div class="step" id="step-password">
+      <div class="form-group">
+        <label>🔑 Two-Factor Password</label>
+        <input type="password" id="password" placeholder="Enter your 2FA password">
+      </div>
+      <button class="btn" id="btn-password">Submit Password</button>
+      <div class="status" id="status-password"></div>
+    </div>
+    
+    <hr class="divider">
+    
+    <!-- Result -->
+    <div class="result" id="result">
+      <div class="result-label">✅ Your Session String</div>
+      <div class="result-string" id="session-string"></div>
+      <div class="user-info" id="user-info"></div>
+      <button class="btn btn-secondary" id="btn-copy">📋 Copy to Clipboard</button>
+      <button class="btn btn-secondary" id="btn-save">💾 Save to File</button>
+    </div>
+    
+    <div class="warning" id="warning">
+      <div class="warning-text">
+        ⚠️ <strong>Security Warning:</strong> This session string gives full access to your account.
+        Store it securely and never share it with anyone.
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // State
+    let sessionData = null;
+    
+    // DOM Elements
+    const apiIdInput = document.getElementById('api-id');
+    const apiHashInput = document.getElementById('api-hash');
+    const btnApi = document.getElementById('btn-api');
+    
+    const phone = document.getElementById('phone');
+    const code = document.getElementById('code');
+    const password = document.getElementById('password');
+    
+    const statusPhone = document.getElementById('status-phone');
+    const statusCode = document.getElementById('status-code');
+    const statusPassword = document.getElementById('status-password');
+    
+    const btnPhone = document.getElementById('btn-phone');
+    const btnCode = document.getElementById('btn-code');
+    const btnPassword = document.getElementById('btn-password');
+    
+    const resultDiv = document.getElementById('result');
+    const sessionStringEl = document.getElementById('session-string');
+    const userInfoEl = document.getElementById('user-info');
+    const warningDiv = document.getElementById('warning');
+    
+    function setStatus(el, msg, type) {
+      el.textContent = msg;
+      el.className = 'status ' + (type || '');
+    }
+    
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(function(s) {
+        s.classList.remove('active');
+      });
+      document.getElementById('step-' + step).classList.add('active');
+    }
+    
+    // Load saved credentials
+    function loadSavedCredentials() {
+      const savedApiId = localStorage.getItem('tg_api_id');
+      const savedApiHash = localStorage.getItem('tg_api_hash');
+      if (savedApiId) apiIdInput.value = savedApiId;
+      if (savedApiHash) apiHashInput.value = savedApiHash;
+    }
+    
+    // Save credentials
+    function saveCredentials() {
+      localStorage.setItem('tg_api_id', apiIdInput.value);
+      localStorage.setItem('tg_api_hash', apiHashInput.value);
+    }
+    
+    // API call
+    async function apiCall(endpoint, data) {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return await res.json();
+    }
+    
+    // Step 0: API Credentials
+    btnApi.addEventListener('click', function() {
+      const apiId = apiIdInput.value.trim();
+      const apiHash = apiHashInput.value.trim();
+      
+      if (!apiId || !apiHash) {
+        alert('Please enter both API ID and API Hash');
+        return;
+      }
+      
+      saveCredentials();
+      showStep('phone');
+      phone.focus();
+    });
+    
+    // Enter key for API credentials
+    apiHashInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') btnApi.click();
+    });
+    
+    // Step 1: Send Code
+    btnPhone.addEventListener('click', async function() {
+      const phoneValue = phone.value.trim();
+      if (!phoneValue) {
+        setStatus(statusPhone, '❌ Please enter your phone number.', 'error');
+        return;
+      }
+      
+      const apiId = apiIdInput.value.trim();
+      const apiHash = apiHashInput.value.trim();
+      
+      if (!apiId || !apiHash) {
+        setStatus(statusPhone, '❌ Please enter API credentials first.', 'error');
+        showStep('api');
+        return;
+      }
+      
+      btnPhone.disabled = true;
+      setStatus(statusPhone, '⏳ Sending code...', 'loading');
+      
+      try {
+        const result = await apiCall('/api/send-code', {
+          api_id: apiId,
+          api_hash: apiHash,
+          phone: phoneValue
+        });
+        
+        if (result.success) {
+          sessionData = result.data;
+          setStatus(statusPhone, '✅ Code sent! Check your Telegram.', 'success');
+          showStep('code');
+          code.focus();
+        } else {
+          setStatus(statusPhone, '❌ ' + result.error, 'error');
+        }
+      } catch (e) {
+        setStatus(statusPhone, '❌ Network error: ' + e.message, 'error');
+      }
+      btnPhone.disabled = false;
+    });
+    
+    // Enter key for phone
+    phone.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') btnPhone.click();
+    });
+    
+    // Step 2: Verify Code
+    btnCode.addEventListener('click', async function() {
+      const codeValue = code.value.trim();
+      if (!codeValue) {
+        setStatus(statusCode, '❌ Please enter the verification code.', 'error');
+        return;
+      }
+      
+      btnCode.disabled = true;
+      setStatus(statusCode, '⏳ Verifying...', 'loading');
+      
+      try {
+        const result = await apiCall('/api/verify-code', {
+          session_id: sessionData.session_id,
+          code: codeValue
+        });
+        
+        if (result.success) {
+          if (result.data.needs_password) {
+            setStatus(statusCode, '🔑 2FA required.', '');
+            showStep('password');
+            password.focus();
+            sessionData = result.data;
+          } else {
+            setStatus(statusCode, '✅ Login successful!', 'success');
+            sessionStringEl.textContent = result.data.session_string;
+            resultDiv.classList.add('show');
+            warningDiv.classList.add('show');
+            btnCode.disabled = true;
+          }
+        } else {
+          setStatus(statusCode, '❌ ' + result.error, 'error');
+        }
+      } catch (e) {
+        setStatus(statusCode, '❌ Network error: ' + e.message, 'error');
+      }
+      btnCode.disabled = false;
+    });
+    
+    // Enter key for code
+    code.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') btnCode.click();
+    });
+    
+    // Step 3: 2FA Password
+    btnPassword.addEventListener('click', async function() {
+      const passwordValue = password.value.trim();
+      if (!passwordValue) {
+        setStatus(statusPassword, '❌ Please enter your 2FA password.', 'error');
+        return;
+      }
+      
+      btnPassword.disabled = true;
+      setStatus(statusPassword, '⏳ Verifying password...', 'loading');
+      
+      try {
+        const result = await apiCall('/api/verify-2fa', {
+          session_id: sessionData.session_id,
+          password: passwordValue
+        });
+        
+        if (result.success) {
+          setStatus(statusPassword, '✅ Login successful!', 'success');
+          sessionStringEl.textContent = result.data.session_string;
+          resultDiv.classList.add('show');
+          warningDiv.classList.add('show');
+          btnPassword.disabled = true;
+        } else {
+          setStatus(statusPassword, '❌ ' + result.error, 'error');
+        }
+      } catch (e) {
+        setStatus(statusPassword, '❌ Network error: ' + e.message, 'error');
+      }
+      btnPassword.disabled = false;
+    });
+    
+    // Enter key for password
+    password.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') btnPassword.click();
+    });
+    
+    // Copy to Clipboard
+    document.getElementById('btn-copy').addEventListener('click', function() {
+      const text = sessionStringEl.textContent;
+      if (!text) return;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+          alert('✅ Session string copied to clipboard!');
+        }).catch(function() {
+          fallbackCopy(text);
+        });
+      } else {
+        fallbackCopy(text);
+      }
+    });
+    
+    function fallbackCopy(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('✅ Session string copied to clipboard!');
+    }
+    
+    // Save to File
+    document.getElementById('btn-save').addEventListener('click', function() {
+      const text = sessionStringEl.textContent;
+      if (!text) return;
+      
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'telegram_session.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+    
+    // Load saved credentials
+    loadSavedCredentials();
+  </script>
+</body>
+</html>
