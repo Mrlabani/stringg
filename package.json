@@ -1,0 +1,11 @@
+{
+  "name": "telegram-session-generator",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "python api/index.py",
+    "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}
